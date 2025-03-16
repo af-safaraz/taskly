@@ -1,5 +1,4 @@
-export const API_URL =
-  "https://67b6c38107ba6e5908419715.mockapi.io/api/v1/tasks";
+export const API_URL = import.meta.env.VITE_API_BASE_URL;
 
 export const fetchTasks = async () => {
   const response = await fetch(API_URL);
