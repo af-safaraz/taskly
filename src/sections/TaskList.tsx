@@ -37,9 +37,12 @@ const TaskList = () => {
   const handleAddTask = (e: React.FormEvent) => {
     e.preventDefault();
     if (taskName.trim() === "") return;
-    dispatch(createTask({ name: taskName, description: "", dueDate: "" }));
+    dispatch(createTask({ name: taskName, description: "", dueDate: "" })).then(
+      () => {
+        dispatch(getTasks());
+      }
+    );
     setTaskName("");
-    dispatch(getTasks());
   };
 
   const handleRefreshTasks = () => {

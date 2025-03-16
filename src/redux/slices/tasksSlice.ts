@@ -1,7 +1,5 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import { fetchTasks, addTask, updateTask, deleteTask } from "../../api/taskAPI";
-import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
 
 export interface Task {
   id: string;
@@ -13,7 +11,7 @@ export interface Task {
 
 interface TasksState {
   tasks: Task[];
-  filteredTask: Task[];
+  filteredTasks: Task[];
   loading: boolean;
   selectedTask: Task | null;
   isDetailOpen: boolean;
@@ -22,7 +20,7 @@ interface TasksState {
 
 const initialState: TasksState = {
   tasks: [],
-  filteredTask: [],
+  filteredTasks: [],
   loading: false,
   selectedTask: null,
   isDetailOpen: false,
@@ -70,43 +68,33 @@ export const removeTask = createAsyncThunk(
 );
 
 const applyFilter = (tasks: Task[], filter: string): Task[] => {
-  dayjs.extend(utc);
-  // const todayLocal = new Date();
+  const todayLocal = new Date();
 
-  // const todayUTC = new Date(
-  //   Date.UTC(
-  //     todayLocal.getFullYear(),
-  //     todayLocal.getMonth(),
-  //     todayLocal.getDate()
-  //   )
-  // );
+  const todayUTC = new Date(
+    Date.UTC(
+      todayLocal.getFullYear(),
+      todayLocal.getMonth(),
+      todayLocal.getDate()
+    )
+  );
 
-  // const nextWeekUTC = new Date(todayUTC);
-  // nextWeekUTC.setDate(todayUTC.getDate() + 6);
+  const nextWeekUTC = new Date(todayUTC);
+  nextWeekUTC.setDate(todayUTC.getDate() + 6);
 
-  const todayUTC = dayjs.utc().startOf("day");
-  const nextWeekUTC = todayUTC.add(6, "day");
-
-  const filteredTask = tasks.filter((task) => {
-    // const taskDate = new Date(task.dueDate);
-    // taskDate.setUTCHours(0, 0, 0, 0);
-    const taskDate = dayjs.utc(task.dueDate).startOf("day");
+  const filteredTasks = tasks.filter((task) => {
+    const taskDate = new Date(task.dueDate);
+    taskDate.setUTCHours(0, 0, 0, 0);
     if (filter === "Today") {
-      // return taskDate.getTime() === todayUTC.getTime();
-      return taskDate.isSame(todayUTC, "day");
+      return taskDate.getTime() === todayUTC.getTime();
     }
 
     if (filter === "Next 7 Days") {
-      // return taskDate >= todayUTC && taskDate <= nextWeekUTC;
-      return (
-        taskDate.isSame(todayUTC, "day") ||
-        (taskDate.isAfter(todayUTC) && taskDate.isBefore(nextWeekUTC))
-      );
+      return taskDate >= todayUTC && taskDate <= nextWeekUTC;
     }
     return true;
   });
 
-  return filteredTask;
+  return filteredTasks;
 };
 
 // Slice
@@ -123,15 +111,19 @@ const tasksSlice = createSlice({
     },
     setFilter: (state, action: PayloadAction<string>) => {
       state.filter = action.payload;
-      state.filteredTask = applyFilter(state.tasks, action.payload);
+      state.filteredTasks = applyFilter(state.tasks, action.payload);
     },
     editTaskOptimistic: (
       state,
       action: PayloadAction<{ id: string; updates: Partial<Task> }>
     ) => {
       const task = state.tasks.find((task) => task.id === action.payload.id);
-      if (task) {
+      const filteredTask = state.filteredTasks.find(
+        (task) => task.id === action.payload.id
+      );
+      if (task && filteredTask) {
         Object.assign(task, action.payload.updates);
+        Object.assign(filteredTask, action.payload.updates);
       }
     },
   },
@@ -142,8 +134,8 @@ const tasksSlice = createSlice({
       })
       .addCase(getTasks.fulfilled, (state, action) => {
         state.tasks = action.payload;
-        state.filteredTask = applyFilter(action.payload, state.filter);
-        state.filteredTask = action.payload.sort((a: Task, b: Task) => {
+        state.filteredTasks = applyFilter(action.payload, state.filter);
+        state.filteredTasks = action.payload.sort((a: Task, b: Task) => {
           if (a.completed !== b.completed) {
             return Number(a.completed) - Number(b.completed);
           }
@@ -165,11 +157,10 @@ const tasksSlice = createSlice({
         if (index !== -1) state.tasks[index] = action.payload;
       })
       .addCase(editTask.rejected, (state, action) => {
-        // Rollback the task if API update fails
-        const { id, updates } = action.meta.arg; // Get the original optimistic updates
+        const { id, updates } = action.meta.arg;
         const task = state.tasks.find((task) => task.id === id);
         if (task) {
-          Object.assign(task, updates); // Revert to the previous state
+          Object.assign(task, updates);
         }
       })
       .addCase(removeTask.fulfilled, (state, action) => {

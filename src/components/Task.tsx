@@ -22,8 +22,9 @@ import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 
 const Task = () => {
+  dayjs.extend(utc);
   const dispatch = useDispatch<AppDispatch>();
-  const { filteredTask, loading } = useSelector(
+  const { filteredTasks, loading } = useSelector(
     (state: RootState) => state.tasks
   );
 
@@ -31,47 +32,19 @@ const Task = () => {
     dispatch(getTasks());
   }, [dispatch]);
 
-  // Filter Task based on Navbar
-  dayjs.extend(utc);
-  // const todayLocal = new Date();
-
-  // const todayUTC = new Date(
-  //   Date.UTC(
-  //     todayLocal.getFullYear(),
-  //     todayLocal.getMonth(),
-  //     todayLocal.getDate()
-  //   )
-  // );
-
-  // const nextWeekUTC = new Date(todayUTC);
-  // nextWeekUTC.setDate(todayUTC.getDate() + 6);
-
-  // const currentFilter = useSelector((state: RootState) => state.tasks.filter);
-
-  // const filteredTask = tasks.filter((task) => {
-  //   const taskDate = new Date(task.dueDate);
-  //   taskDate.setUTCHours(0, 0, 0, 0);
-  //   if (currentFilter === "Today") {
-  //     return taskDate.getTime() === todayUTC.getTime();
-  //   }
-
-  //   if (currentFilter === "Next 7 Days") {
-  //     return taskDate >= todayUTC && taskDate <= nextWeekUTC;
-  //   }
-  //   return true;
-  // });
-
   // Handle task checkbox
   const handleTaskCheck = (id: string, completed: boolean) => {
     dispatch(editTaskOptimistic({ id, updates: { completed: !completed } }));
-    dispatch(editTask({ id, updates: { completed: !completed } }));
+    dispatch(editTask({ id, updates: { completed: !completed } })).then(() => {
+      dispatch(getTasks());
+    });
   };
 
   return (
     <List sx={{ width: "100%", bgcolor: "background.paper" }}>
       <Divider />
       {loading && <p>Loading...</p>}
-      {filteredTask.map((task) => {
+      {filteredTasks.map((task) => {
         const labelId = `checkbox-list-label-${task.id}`;
         const dateString = task.dueDate;
         const today = dayjs.utc().format("DD/MM/YYYY");

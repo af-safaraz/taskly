@@ -26,6 +26,7 @@ import {
   closeDetail,
   editTask,
   removeTask,
+  getTasks,
   Task,
 } from "../redux/slices/tasksSlice";
 import { useState, useEffect } from "react";
@@ -88,7 +89,9 @@ const TaskDetail = () => {
         id: selectedTask.id,
         updates: { ...task, dueDate: dueDateTime },
       })
-    );
+    ).then(() => {
+      dispatch(getTasks());
+    });
     dispatch(closeDetail());
   };
 
@@ -96,7 +99,9 @@ const TaskDetail = () => {
     if (id === "") {
       return;
     }
-    dispatch(removeTask(id));
+    dispatch(removeTask(id)).then(() => {
+      dispatch(getTasks());
+    });
     setDelDialogOpen(false);
     dispatch(closeDetail());
   };
