@@ -1,50 +1,23 @@
-# React + TypeScript + Vite
+# Taskly - A Simple Task Management App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Live on: https://taskly-sfrz.vercel.app/
 
-Currently, two official plugins are available:
+Taskly is a simple yet functional to-do app that allows users to manage their tasks efficiently. I built this project to deepen my understanding of React, TypeScript, Material UI, and API handling while working on a real-world application. This project also served as an opportunity for me to explore state management, API integration, and UI design in a structured way. I used Redux Toolkit to manage global state and API interactions efficiently. By using MockAPI.io as a backend, I was able to simulate real API interactions, making the project feel more dynamic and interactive.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+> :warning: Note: This app is not ready for actual use yet, as there is no authentication system in place. This means that all users are accessing the same shared task list.
 
-## Expanding the ESLint configuration
+Features:
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+- Add, edit, and remove tasks
+- Assign a due date to tasks
+- View all tasks, today's tasks, or tasks due in the next 7 days
+- Mark tasks as complete
 
-- Configure the top-level `parserOptions` property like this:
+Tech Stack:
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
-
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
-
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
-
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
+- Vite
+- React
+- TypeScript
+- Material UI
+- Redux Toolkit
+- MockAPI.io
