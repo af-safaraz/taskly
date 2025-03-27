@@ -55,7 +55,7 @@ const Navbar = () => {
         }}
       >
         <Typography variant="h5" color="primary">
-          TinyTask
+          Taskly
         </Typography>
         <AddTaskIcon color="primary" sx={{ ml: 1 }} />
       </DrawerHeader>
